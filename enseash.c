@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
 		
 		// Wait that the user write a command
 		int size_reading = read(STDIN_FILENO, &command, 10);
-		if (size_reading == -1) {exit(EXIT_FAILURE);};
+		if (size_reading == -1) {exit(EXIT_FAILURE);}; // Read the command writing by the user
 		
 		// Create a fork
 		int pid; int status;
