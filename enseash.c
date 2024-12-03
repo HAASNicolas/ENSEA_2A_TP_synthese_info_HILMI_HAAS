@@ -17,6 +17,13 @@ int main(int argc, char *argv[]) {
 		// Wait that the user write a command
 		int size_reading = read(STDIN_FILENO, &command, 10);
 		if (size_reading == -1) {exit(EXIT_FAILURE);}; // Read the command writing by the user
+				
+		command[size_reading-1] = 0; // Replaces \n with the end of text string character
+		
+		if (strcmp(command, "exit") == 0) { // Check if the command is exit
+			if (write(STDOUT_FILENO, "Bye bye...\n", 11) == -1) {exit(EXIT_FAILURE);};
+			break; // Execute the command "exit", so close the shell
+		}
 		
 		// Create a fork
 		int pid; int status;
@@ -25,10 +32,11 @@ int main(int argc, char *argv[]) {
 		if (pid != 0) { // Father
 			wait(&status); // Father wait that the son ends
 		} else { // Son
-			command[size_reading-1] = 0;
 			execlp(command, command, (char *)NULL); // Execute the command writed by the user
 			exit(EXIT_SUCCESS); // Returns SUCCESS to indicate that everything went well
-		}
+		}	
 	}
+	if (write(STDOUT_FILENO, "%", 1) == -1) {exit(EXIT_FAILURE);};
+	exit(EXIT_SUCCESS); // Returns SUCCESS to indicate that everything went well
 }
 
