@@ -2,7 +2,7 @@
 
 ## Etudiants
 * Anass HILMI
-* Nicolas
+* Nicolas HAAS
 
 ## TP1
 ### 1. Affichage d’un message d’accueil, suivi d’un prompt simple.
