@@ -2,18 +2,21 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 int main(int argc, char *argv[]) {
 	// Using STDOUT_FILENO to write to standard output (the console)
 	if (write(STDOUT_FILENO, "$ ./enseash\n", 12) == -1) {exit(EXIT_FAILURE);};
 	if (write(STDOUT_FILENO, "Bienvenue dans le Shell ENSEA.\n", 31) == -1) {exit(EXIT_FAILURE);};
 	if (write(STDOUT_FILENO, "Pour quitter, tapez 'exit'.\n", 28) == -1) {exit(EXIT_FAILURE);};
+		
+	if (write(STDOUT_FILENO, "enseash", 7) == -1) {exit(EXIT_FAILURE);}; // Ask the user to write a command
 	
 	char command[10]; // Chars reading are saved in this buffer
 	while (1) {
-		// Ask the user to write a command
-		if (write(STDOUT_FILENO, "enseash % ", 10) == -1) {exit(EXIT_FAILURE);};
-		
+
+		if (write(STDOUT_FILENO, " % ", 3) == -1) {exit(EXIT_FAILURE);}; // Ask the user to write a command
+			
 		// Wait that the user write a command
 		int size_reading = read(STDIN_FILENO, &command, 10);
 		if (size_reading == -1) {exit(EXIT_FAILURE);}; // Read the command writing by the user
@@ -30,7 +33,20 @@ int main(int argc, char *argv[]) {
 		pid = fork();
 		
 		if (pid != 0) { // Father
+			
 			wait(&status); // Father wait that the son ends
+			
+			if (write(STDOUT_FILENO, "enseash", 7) == -1) {exit(EXIT_FAILURE);};
+			
+			// Display the return code or the son's signal
+			char msg[10];
+			if (WIFEXITED(status)) {
+				sprintf(msg, " [exit:%d]", WEXITSTATUS(status));
+			} else if (WIFSIGNALED(status)) {
+				sprintf(msg, " [sign:%d]", WTERMSIG(status));
+			}
+			if (write(STDOUT_FILENO, msg, 9) == -1) {exit(EXIT_FAILURE);}; // Display
+			
 		} else { // Son
 			execlp(command, command, (char *)NULL); // Execute the command writed by the user
 			exit(EXIT_SUCCESS); // Returns SUCCESS to indicate that everything went well
