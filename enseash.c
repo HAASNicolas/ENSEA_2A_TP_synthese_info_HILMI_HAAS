@@ -11,17 +11,24 @@ int main(int argc, char *argv[]) {
 	
 	char command[10]; // Chars reading are saved in this buffer
 	while (1) {
-		// Ask and wait a command
+		// Ask the user to write a command
 		if (write(STDOUT_FILENO, "enseash % ", 10) == -1) {exit(EXIT_FAILURE);};
-		if (read(STDIN_FILENO, &command, 10) == -1) {exit(EXIT_FAILURE);};
 		
-		// Execute the command, strcmp allows us to compare two strings.
-		if (strcmp(command, "fortune\n") == 0) {
-			// Execute the command "fortune", by writing a phrase in the shell
-			if (write(STDOUT_FILENO, "Today is what happened to yesterday.\n", 37) == -1) {exit(EXIT_FAILURE);};
+		// Wait that the user write a command
+		int size_reading = read(STDIN_FILENO, &command, 10);
+		if (size_reading == -1) {exit(EXIT_FAILURE);};
+		
+		// Create a fork
+		int pid; int status;
+		pid = fork();
+		
+		if (pid != 0) { // Father
+			wait(&status); // Father wait that the son ends
+		} else { // Son
+			command[size_reading-1] = 0;
+			execlp(command, command, (char *)NULL); // Execute the command writed by the user
+			exit(EXIT_SUCCESS); // Returns SUCCESS to indicate that everything went well
 		}
 	}
-	
-	//exit(EXIT_SUCCESS); // Returns SUCCESS to indicate that everything went well
 }
 
