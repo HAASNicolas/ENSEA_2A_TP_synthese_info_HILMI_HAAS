@@ -13,13 +13,13 @@ int main(int argc, char *argv[]) {
 		
 	if (write(STDOUT_FILENO, "enseash", 7) == -1) {exit(EXIT_FAILURE);}; // Ask the user to write a command
 	
-	char command[10]; // Chars reading are saved in this buffer
+	char command[50]; // Chars reading are saved in this buffer
 	while (1) {
 
 		if (write(STDOUT_FILENO, " % ", 3) == -1) {exit(EXIT_FAILURE);}; // Ask the user to write a command
 			
 		// Wait that the user write a command
-		int size_reading = read(STDIN_FILENO, &command, 10);
+		int size_reading = read(STDIN_FILENO, &command, 50);
 		if (size_reading == -1) {exit(EXIT_FAILURE);}; // Read the command writing by the user
 				
 		command[size_reading-1] = 0; // Replaces \n with the end of text string character
@@ -43,11 +43,11 @@ int main(int argc, char *argv[]) {
 			struct timespec tp;
 			clock_gettime(CLOCK_REALTIME, &tp);
 			
-			// Display the return code or the son's signal
+			// Display the return code or the son's signal and the execute time
 			char msg[16];
-			if (WIFEXITED(status)) {
+			if (WIFEXITED(status)) { // WIFEXITED is true if the process exited via the exit() system call
 				sprintf(msg, " [exit:%d|%ldms]", WEXITSTATUS(status), tp.tv_nsec/1000000);
-			} else if (WIFSIGNALED(status)) {
+			} else if (WIFSIGNALED(status)) { // WIFSIGNALED is true if the process ends with an unhandled error
 				sprintf(msg, " [sign:%d|%ldms]", WTERMSIG(status), tp.tv_nsec/1000000);
 			}
 			if (write(STDOUT_FILENO, msg, sizeof(msg)) == -1) {exit(EXIT_FAILURE);}; // Display
