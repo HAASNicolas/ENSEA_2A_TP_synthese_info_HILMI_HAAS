@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <time.h>
 
 int main(int argc, char *argv[]) {
 	// Using STDOUT_FILENO to write to standard output (the console)
@@ -38,14 +39,17 @@ int main(int argc, char *argv[]) {
 			
 			if (write(STDOUT_FILENO, "enseash", 7) == -1) {exit(EXIT_FAILURE);};
 			
+			struct timespec tp;
+			clock_gettime(CLOCK_REALTIME, &tp);
+			
 			// Display the return code or the son's signal
-			char msg[10];
+			char msg[16];
 			if (WIFEXITED(status)) {
-				sprintf(msg, " [exit:%d]", WEXITSTATUS(status));
+				sprintf(msg, " [exit:%d|%ldms]", WEXITSTATUS(status), tp.tv_nsec/1000000);
 			} else if (WIFSIGNALED(status)) {
-				sprintf(msg, " [sign:%d]", WTERMSIG(status));
+				sprintf(msg, " [sign:%d|%ldms]", WTERMSIG(status), tp.tv_nsec/1000000);
 			}
-			if (write(STDOUT_FILENO, msg, 9) == -1) {exit(EXIT_FAILURE);}; // Display
+			if (write(STDOUT_FILENO, msg, sizeof(msg)) == -1) {exit(EXIT_FAILURE);}; // Display
 			
 		} else { // Son
 			execlp(command, command, (char *)NULL); // Execute the command writed by the user
