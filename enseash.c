@@ -39,6 +39,7 @@ int main(int argc, char *argv[]) {
 			
 			if (write(STDOUT_FILENO, "enseash", 7) == -1) {exit(EXIT_FAILURE);};
 			
+			// Get the execute time
 			struct timespec tp;
 			clock_gettime(CLOCK_REALTIME, &tp);
 			
